@@ -1,16 +1,29 @@
 <?php
-	//	https://api.telegram.org/bot1054298584:AAG2ym2K4Q4AT5yvoehmE6G5u2s3js4xihs/setWebhook?url=https://teorema.uz/uzmia_bot/bot.php	//	setting webhook
-	// define("API_KEY", "906088381:AAHj0LwmCnnWuU-6g1UyDZuCm7arFAOj5DQ");	//	@testing_send_message_bot
-	
+	include "private.php";
 
-	//	Telegram - UZMIA_BOT Token
-		define("API_KEY", "1054298584:AAG2ym2K4Q4AT5yvoehmE6G5u2s3js4xihs");	//	@uzmia_bot
+	// DB CONNECTION
+	$con = mysqli_connect(
+		DB_HOST,
+		DB_USERNAME,
+		DB_PASSWORD,
+		DB_NAME
+	);
 
-	//	Variables from new Updates 
+	if(!con) {
+		die("DATABASE CONNECTION FAILED!");
+	}
+
+	//	WEBHOOK VARIABLES
 	$update = json_decode(file_get_contents("php://input"));
-	$message = $update -> message;
-	$chat_id = $message -> chat -> id;
-	$text = $message -> text;
+	
+	$user_id		= $update -> message -> from -> id;
+	$first_name		= $update -> message -> from -> first_name;
+	$username		= $update -> message -> from -> username;
+
+	$chat_id		= $update -> message -> chat -> id;
+	$ini_date		= $update -> message -> date;
+	$message		= $update -> message -> text;
+
 
 	//	Functions
 	function bot($method, $datas=[]) {
