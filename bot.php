@@ -1,5 +1,13 @@
 <?php
-	include "private.php";
+	require_once("private.php");
+	/********************************************
+		#PREDEFINED CONSTANTS IN PRIVATE.PHP
+			DB_HOST
+			DB_USERNAME
+			DB_PASSWORD
+			DB_NAME
+			API_KEY
+	********************************************/
 
 	// DB CONNECTION
 	$con = mysqli_connect(
@@ -9,80 +17,35 @@
 		DB_NAME
 	);
 
-	if(!con) {
+	if(!con)
 		die("DATABASE CONNECTION FAILED!");
-	}
 
-	//	WEBHOOK VARIABLES
+
+	//	WEBHOOK
 	$update = json_decode(file_get_contents("php://input"));
-	
+
 	$user_id		= $update -> message -> from -> id;
 	$first_name		= $update -> message -> from -> first_name;
 	$username		= $update -> message -> from -> username;
-
 	$chat_id		= $update -> message -> chat -> id;
 	$ini_date		= $update -> message -> date;
 	$message		= $update -> message -> text;
 
 
-	//	Functions
-	function bot($method, $datas=[]) {
-		$url = "https://api.telegram.org/bot" .API_KEY ."/" .$method;
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $datas);
-		$res = curl_exec($ch);
-		if(curl_error($ch))
-			var_dump(curl_error($ch));
-		else
-			return json_decode($res);
-	}
+	// VARIABLES
+	$name = "";
+	$age = "";
+	$city = "";
+	$address = "";
+	$school = "";
+	$level = "";
 
-	function typing($ch) {
-		return bot("sendChatAction", [
-			"chat_id" => $ch,
-			"action" => "typing"
-		]);
-	}
+	// ADDING USER TO USER TABLE
+	add_user();
 
-	function delete_files($target) {
-	    if(is_dir($target)) {
-	        $files = glob( $target . '*', GLOB_MARK ); //GLOB_MARK adds a slash to directories returned
 
-	        foreach( $files as $file ){
-	            delete_files( $file );      
-	        }
-
-	        rmdir( $target );
-	    } elseif(is_file($target)) {
-	        unlink( $target );  
-	    }
-	}
-
-	function upload($name, $level, $phone) {
-		$regs = file_get_contents("regs.log");
-		$regs++;
-		$data = "
-		<tr>
-			<td>".$regs."</td>
-			<td>".$name."</td>
-			<td>".$level."</td>
-			<td>".$phone."</td>
-		</tr>
-		";
-		file_put_contents("table.html", $data, FILE_APPEND);
-		file_put_contents("regs.log", $regs);
-	}
-
-	function seen() {
-		$num = file_get_contents("seen.log");
-		$num++;
-		file_put_contents("seen.log", $num);
-	}
-
-	// Buttons
-	$buttons = json_encode([
+	// TELEGRAM BUTTONS
+	$default = json_encode([
 		"resize_keyboard" => true,
 		"keyboard" =>
 		[
@@ -106,13 +69,13 @@
 		]
 	]);
 
-	$yes_no = json_encode([
+	$submit = json_encode([
 		"resize_keyboard" => true,
 		"keyboard" =>
 		[
 			[
+				["text" => "Tasdiqlash"],
 				["text" => "Bekor qilish"],
-				["text" => "Yuborish"],
 			]
 		]
 	]);
@@ -122,8 +85,12 @@
 		"keyboard" =>
 		[
 			[
-				["text" => "7-8 sinf"],
-				["text" => "9-10-11 sinf"]
+				["text" => "9 - sinf"],
+				["text" => "10 - sinf"],
+				["text" => "11 - sinf"]
+			],
+			[
+				["text" => "Talaba"],
 			],
 			[
 				["text" => "Bekor qilish"]
@@ -132,11 +99,12 @@
 	]);
 
 	//	******************* REGISTRATION STARTS FROM HERE ************************
-	if(isset($text)) {
-		typing($chat_id);
-		if($text == "👥Ro'yxatdan o'tish") {
-			mkdir($chat_id);
-			file_put_contents("$chat_id/step.log", "0");
+	if(isset($message)) {
+		typing();
+
+		if($message == "👥Ro'yxatdan o'tish") {
+			mkdir("temp/$chat_id");
+			file_put_contents("temp/$chat_id/step.log", "0");
 			bot("sendMessage", [
 				"chat_id" => $chat_id,
 				"text" => "Ism sharifingizni kiriting:",
@@ -145,10 +113,11 @@
 			]);
 		}
 
-		else if(is_dir($chat_id)) {
-			if(file_get_contents("$chat_id/step.log") == "0") {
-				if($text == "Bekor qilish") {
-					delete_files($chat_id);
+		else if(is_dir("temp/$chat_id")) {
+			$step = file_get_contents("$chat_id/step.log");
+			if($step == "0") {
+				if($message == "Bekor qilish") {
+					delete_files();
 					bot("sendMessage", [
 						"chat_id" => $chat_id,
 						"text" => "Ro'yxat bekor qilindi!",
@@ -157,7 +126,7 @@
 					]);
 				} else {
 					file_put_contents("$chat_id/step.log", "1");
-					file_put_contents("$chat_id/name.log", $text);
+					file_put_contents("$chat_id/name.log", $message);
 					bot("sendMessage", [
 						"chat_id" => $chat_id,
 						"text" => "Nechinchi sinf o'quvchisisiz?",
@@ -167,7 +136,7 @@
 				}
 			}
 			else if(file_get_contents("$chat_id/step.log") == "1") {
-				if($text == "Bekor qilish") {
+				if($message == "Bekor qilish") {
 					delete_files($chat_id);
 					bot("sendMessage", [
 						"chat_id" => $chat_id,
@@ -177,7 +146,7 @@
 					]);
 				} else {
 					file_put_contents("$chat_id/step.log", "2");
-					file_put_contents("$chat_id/level.log", $text);
+					file_put_contents("$chat_id/level.log", $message);
 					bot("sendMessage", [
 						"chat_id" => $chat_id,
 						"text" => "📞 Telefon raqamingizni kiriting: ",
@@ -187,7 +156,7 @@
 				}
 			}
 			else if(file_get_contents("$chat_id/step.log") == "2") {
-				if($text == "Bekor qilish") {
+				if($message == "Bekor qilish") {
 					delete_files($chat_id);
 					bot("sendMessage", [
 						"chat_id" => $chat_id,
@@ -197,7 +166,7 @@
 					]);
 				} else {
 					file_put_contents("$chat_id/step.log", "3");
-					file_put_contents("$chat_id/phone.log", $text);
+					file_put_contents("$chat_id/phone.log", $message);
 					$name = file_get_contents("$chat_id/name.log");
 					$level = file_get_contents("$chat_id/level.log");
 					$phone = file_get_contents("$chat_id/phone.log");
@@ -210,7 +179,7 @@
 				}
 			}
 			else if(file_get_contents("$chat_id/step.log") == "3") {
-				if($text == "Bekor qilish") {
+				if($message == "Bekor qilish") {
 					delete_files($chat_id);
 					bot("sendMessage", [
 						"chat_id" => $chat_id,
@@ -218,7 +187,7 @@
 						"parse_mode" => "markdown",
 						"reply_markup" => $buttons
 					]);
-				} else if($text == "Yuborish") {
+				} else if($message == "Yuborish") {
 					$name = file_get_contents("$chat_id/name.log");
 					$level = file_get_contents("$chat_id/level.log");
 					$phone = file_get_contents("$chat_id/phone.log");
@@ -234,7 +203,7 @@
 			}
 		}
 		//	********************************************************************
-		else if($text == "/start") {
+		else if($message == "/start") {
 			seen();
 			bot("sendMessage", [
 				"chat_id" => $chat_id,
@@ -250,7 +219,7 @@
 			]);
 		}
 
-		else if($text == "📍Manzil") {
+		else if($message == "📍Manzil") {
 			bot("sendMessage", [
 				"chat_id" => $chat_id,
 				"text" => "📌Musobaqa manzili:",
@@ -265,7 +234,7 @@
 			]);
 		}
 
-		else if($text == "📲Biz bilan bog'lanish") {
+		else if($message == "📲Biz bilan bog'lanish") {
 			bot("sendMessage", [
 				"chat_id" => $chat_id,
 				"text" => "📥 <b>Biz bilan bog'lanish:</b> \n\n📞 Tel.: <a href=\"tel:998712670027\">+998 71-267-00-27</a>\n🌐 Telegram: <a href=\"https://t.me/uzmia31\">UZMIA</a>",
@@ -274,7 +243,7 @@
 			]);
 		}
 
-		else if($text == "Bekor qilish") {
+		else if($message == "Bekor qilish") {
 			bot("sendMessage", [
 				"chat_id" => $chat_id,
 				"text" => "Ro'yxatdan o'tish bekor qilindi!",
