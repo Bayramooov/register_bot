@@ -16,7 +16,8 @@
 		$query = "INSERT INTO USERS VALUES ($user_id, $chat_id, $first_name, $username, $ini_date)";
 		$result = msqli_query($con, $query);
 		if(!result)
-			echo "add_user() - error!";
+			return false;// echo "add_user() - error!";
+		return true;
 	}
 
 	function delete_files() {

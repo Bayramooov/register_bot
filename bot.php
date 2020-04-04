@@ -31,18 +31,19 @@
 	$ini_date		= $update -> message -> date;
 	$message		= $update -> message -> text;
 
-
-	// VARIABLES
-	$name = "";
-	$age = "";
-	$region = "";
-	$address = "";
-	$school = "";
-	$level = "";
-	$phone = ""
+	/******************
+	#VARIABLES
+		name
+		age
+		region
+		school
+		level
+		phone
+	******************/
 
 	// VALIDATION
-	$age_pattern = "";
+	$age_pattern = "/^\d\d$/";
+	
 	$is_region =
 		  ($message == "Toshkent shahri")
 		||($message == "Toshkent viloyati")
@@ -65,9 +66,7 @@
 		||($message == "11 - sinf")
 		||($message == "Talaba");
 
-	$phone_pattern;
-
-	// ADDING USER TO USER TABLE
+	$phone_pattern = "/.*/";
 
 
 	// TELEGRAM BUTTONS
@@ -389,7 +388,25 @@
 		}
 		//	********************************************************************
 		else if($message == "/start") {
-			add_user();
+			// add_user();
+
+			/////////////////////// TESTING PART ///////////////////////
+			if(add_user()) {
+				bot("sendMessage", [
+					"chat_id" => $chat_id,
+					"text" => "Successfully Connected with DB.",
+					"parse_mode" => "markdown",
+					"reply_markup" => $default
+				]);
+			} else {
+				bot("sendMessage", [
+					"chat_id" => $chat_id,
+					"text" => "add_user() - error!",
+					"parse_mode" => "markdown",
+					"reply_markup" => $default
+				]);
+			}
+			/////////////////////// TESTING PART ///////////////////////
 
 			bot("sendMessage", [
 				"chat_id" => $chat_id,
