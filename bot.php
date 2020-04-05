@@ -1,25 +1,30 @@
 <?php
 	require_once("private.php");
 	require_once("funcs.php");
-	/********************************************
-		#PREDEFINED CONSTANTS IN PRIVATE.PHP
+	/***********************************************
+		#PREDEFINED CONSTANTS FROM PRIVATE.PHP
 			DB_HOST
 			DB_USERNAME
 			DB_PASSWORD
 			DB_NAME
 			API_KEY
-	********************************************/
 
-
+		#PREDEFINED FUNCTIONS FROM FUNCS.PHP
+			add_user($con, $update);
+			add_candidate($con, $chat_id, $date);
+			date_convert($date);
+			delete_files($location);
+			bot($method, $datas=[]);
+			typing($chat_id);
+	***********************************************/
 	//	WEBHOOK
 	$update = json_decode(file_get_contents("php://input"));
-
 	$chat_id		= $update -> message -> chat -> id;
 	$first_name		= $update -> message -> from -> first_name;
 	$username		= $update -> message -> chat -> username;
 	$date			= $update -> message -> date;
+	$date			= date_convert($date);
 	$message		= $update -> message -> text;
-
 
 	// DB CONNECTION
 	$con = mysqli_connect(
@@ -28,32 +33,25 @@
 		DB_PASSWORD,
 		DB_NAME
 	);
-
-
 	//////////////////////////////////////// EXCEPTION HANGLING ////////////////////////////////////////
 	if(!$con) {
-		echo "DATABASE CONNECTION FAILED!";
-
+		typing($chat_id);
 		bot("sendMessage", [
 			"chat_id" => $chat_id,
-			"text" => "Kechirasiz texnik nosozlik sodir bo'ldi. Iltimos birozdan keyin habar oling.",
+			"text" => "Kechirasiz texnik nosozlik sodir bo'ldi. Bu haqda texnik hodimlarga habar jo'natildi. Iltimos birozdan keyin habar oling.",
 			"parse_mode" => "markdown",
 			"reply_markup" => $default
 		]);
-
-		$time = date_convert($date);
-
+		typing("373537481");
 		bot("sendMessage", [
 			"chat_id" => "373537481",	//ADMIN
-			"text" => "<b>DATABASE CONNECTION FAILED!</b>\n\nCHAT_ID: <b><i>$chat_id</i></b>\nName: <b><i>$first_name</i></b>\nUsername: <b><i>@$username</i></b>\nTime: <b><i>$time</i></b>\nMessage:\n\n<b><i>$message</i></b>",
+			"text" => "<b>DATABASE CONNECTION FAILED!</b>\n\nCHAT_ID: <b><i>$chat_id</i></b>\nName: <b><i>$first_name</i></b>\nUsername: <b><i>@$username</i></b>\nTime: <b><i>$date</i></b>\nMessage:\n\n<b><i>$message</i></b>",
 			"parse_mode" => "html",
 			"reply_markup" => ""
 		]);
 		die();
 	}
 	//////////////////////////////////////// EXCEPTION HANGLING ////////////////////////////////////////
-
-
 	/*********************
 		#VARIABLES
 			NAME
@@ -63,8 +61,6 @@
 			LEVEL
 			PHONE
 	*********************/
-
-
 	// VALIDATION
 	$age_pattern = "/^\d\d$/";
 	$is_region =
@@ -89,7 +85,6 @@
 		||($message == "Talaba");
 	$phone_pattern = "/.*/";
 
-
 	// TELEGRAM BUTTONS
 	$default = json_encode([
 		"resize_keyboard" => true,
@@ -99,12 +94,11 @@
 				["text" => "👥Ro'yxatdan o'tish"]
 			],
 			[
-				["text" => "📍Manzil"],
+				//["text" => "📍Manzil"],
 				["text" => "📲Biz bilan bog'lanish"]
 			]
 		]
 	]);
-
 	$cancel = json_encode([
 		"resize_keyboard" => true,
 		"keyboard" =>
@@ -114,7 +108,6 @@
 			]
 		]
 	]);
-
 	$regions = json_encode([
 		"resize_keyboard" => true,
 		"keyboard" =>
@@ -148,7 +141,6 @@
 			]
 		]
 	]);
-
 	$level = json_encode([
 		"resize_keyboard" => true,
 		"keyboard" =>
@@ -166,7 +158,6 @@
 			]
 		]
 	]);
-
 	$submit = json_encode([
 		"resize_keyboard" => true,
 		"keyboard" =>
@@ -178,14 +169,12 @@
 		]
 	]);
 
-
 	/////////////////////////////////////// REGISTRATION FLOW ///////////////////////////////////////
 	if(isset($message)) {
 		// => REGISTER
 		if($message == "👥Ro'yxatdan o'tish") {
 			if(!is_dir("temp/$chat_id"))
 				mkdir("temp/$chat_id");	
-
 			file_put_contents("temp/$chat_id/step.log", "0");
 			typing($chat_id);
 			bot("sendMessage", [
@@ -195,11 +184,9 @@
 				"reply_markup" => $cancel
 			]);
 		}
-
 		
 		else if(is_dir("temp/$chat_id")) {
 			$step = file_get_contents("temp/$chat_id/step.log");
-
 			// => NAME
 			if($step == "0") {
 				if($message == "Bekor qilish") {
@@ -223,7 +210,6 @@
 					]);
 				}
 			}
-
 			// => AGE
 			else if($step == "1") {
 				if($message == "Bekor qilish") {
@@ -255,7 +241,6 @@
 					]);
 				}
 			}
-
 			// => REGION
 			else if($step == "2") {
 				if($message == "Bekor qilish") {
@@ -287,7 +272,6 @@
 					]);
 				}
 			}
-
 			// => LEVEL
 			else if($step == "3") {
 				if($message == "Bekor qilish") {
@@ -319,7 +303,6 @@
 					]);
 				}
 			}
-
 			// => SCHOOL
 			else if($step == "4") {
 				if($message == "Bekor qilish") {
@@ -343,7 +326,6 @@
 					]);
 				}
 			}
-
 			// => PHONE
 			else if($step == "5") {
 				if($message == "Bekor qilish") {
@@ -358,14 +340,12 @@
 				} else if(preg_match($phone_pattern, $message)) {
 					file_put_contents("temp/$chat_id/step.log", "6");
 					file_put_contents("temp/$chat_id/phone.log", $message);
-
 					$name	= file_get_contents("temp/$chat_id/name.log");
 					$age	= file_get_contents("temp/$chat_id/age.log");
 					$region	= file_get_contents("temp/$chat_id/region.log");
 					$level	= file_get_contents("temp/$chat_id/level.log");
 					$school	= file_get_contents("temp/$chat_id/school.log");
 					$phone	= file_get_contents("temp/$chat_id/phone.log");
-
 					typing($chat_id);
 					bot("sendMessage", [
 						"chat_id" => $chat_id,
@@ -395,39 +375,34 @@
 						"reply_markup" => $default
 					]);
 				} else if($message == "Tasdiqlash") {
-
 					switch (add_candidate($con, $chat_id, $date)) {
-
-					//////////////////////////////////////// EXCEPTION HANGLING ////////////////////////////////////////
+						////////////////////////// EXCEPTION HANGLING //////////////////////////
 						case '0':
 							typing($chat_id);
 							bot("sendMessage", [
 								"chat_id" => $chat_id,
-								"text" => "Kechirasiz texnik nosozlik sodir bo'ldi va ro'yxat bekor qilindi. Iltimos birozdan keyin habar oling.",
+								"text" => "Kechirasiz texnik nosozlik sodir bo'ldi va ro'yxat bekor qilindi. Bu haqda texnik hodimlarga habar jo'natildi. Iltimos birozdan keyin qayta ro'yxatdan o'ting.",
 								"parse_mode" => "markdown",
 								"reply_markup" => $default
 							]);
-							$time = date_convert($date);
 							typing("373537481");
 							bot("sendMessage", [
 								"chat_id" => "373537481",	//ADMIN
-								"text" => "<b>ADD_CANDIDATE(); FAILED!</b>\n\nCHAT_ID: <b><i>$chat_id</i></b>\nName: <b><i>$first_name</i></b>\nUsername: <b><i>@$username</i></b>\nTime: <b><i>$time</i></b>\nMessage:\n\n<b><i>$message</i></b>",
+								"text" => "<b>ADD_CANDIDATE(); FAILED!</b>\n\nCHAT_ID: <b><i>$chat_id</i></b>\nName: <b><i>$first_name</i></b>\nUsername: <b><i>@$username</i></b>\nTime: <b><i>$date</i></b>\nMessage:\n\n<b><i>$message</i></b>",
 								"parse_mode" => "html",
 								"reply_markup" => ""
 							]);
 							die();
-					///////////////////////////////////////// EXCEPTION HANGLING ////////////////////////////////////////
-
+						////////////////////////// EXCEPTION HANGLING //////////////////////////
 						case '1':
 							typing($chat_id);
 							bot("sendMessage", [
 								"chat_id" => $chat_id,
-								"text" => "✅ Siz ro'yxatdan o'tib bo'lgansiz!",
+								"text" => "⚠️ Siz ro'yxatdan o'tib bo'lgansiz!",
 								"parse_mode" => "markdown",
 								"reply_markup" => $default
 							]);
 							break;
-
 						case '2':
 							typing($chat_id);
 							bot("sendMessage", [
@@ -449,8 +424,6 @@
 				}
 			}
 		}
-
-
 		// => /START
 		else if($message == "/start") {
 			typing($chat_id);
@@ -460,36 +433,34 @@
 				"parse_mode" => "markdown",
 				"reply_markup" => $default
 			]);
-
 			//////////////////////////////////////// EXCEPTION HANGLING ////////////////////////////////////////
 			if(!add_user($con, $update)) {
 				typing($chat_id);
 				bot("sendMessage", [
 					"chat_id" => $chat_id,
-					"text" => "Kechirasiz texnik nosozlik sodir bo'ldi. Iltimos birozdan keyin habar oling.",
+					"text" => "Kechirasiz texnik nosozlik sodir bo'ldi. Bu haqda texnik hodimlarga habar jo'natildi. Iltimos birozdan keyin habar oling.",
 					"parse_mode" => "markdown",
 					"reply_markup" => $default
 				]);
-				$time = date_convert($date);
 				typing("373537481");
 				bot("sendMessage", [
 					"chat_id" => "373537481",	//ADMIN
-					"text" => "<b>ADD_USER(); FAILED!</b>\n\nCHAT_ID: <b><i>$chat_id</i></b>\nName: <b><i>$first_name</i></b>\nUsername: <b><i>@$username</i></b>\nTime: <b><i>$time</i></b>\nMessage:\n\n<b><i>$message</i></b>",
+					"text" => "<b>ADD_USER(); FAILED!</b>\n\nCHAT_ID: <b><i>$chat_id</i></b>\nName: <b><i>$first_name</i></b>\nUsername: <b><i>@$username</i></b>\nTime: <b><i>$date</i></b>\nMessage:\n\n<b><i>$message</i></b>",
 					"parse_mode" => "html",
 					"reply_markup" => ""
 				]);
 				die();
 			}
 			//////////////////////////////////////// EXCEPTION HANGLING ////////////////////////////////////////
-
 			typing($chat_id);
 			bot("sendMessage", [
 				"chat_id" => $chat_id,
-				"text" => "<b>\"Muhammad al-Xorazmiy\"</b> nomidagi axborot texnologiyalari va <b>\"O'zbekiston Matematiklar va Informatika Assotsiatsiyasi\"</b> tashabbusi bilan birga tashkil etilgan matematika olimpiadasi qabuliga xush kelibsiz!",
+				"text" => "<b>\"O'zbekiston Yoshlar Ittifoqi\"</b> va <b>\"O'zbekiston Matematiklar va Informatika Assotsiatsiyasi\"</b> tashabbusi bilan birga tashkil etilgan onlayn matematika olimpiadasi qabuliga xush kelibsiz!",
 				"parse_mode" => "html",
 				"reply_markup" => $default
 			]);
 		}
+		/*****************************************************
 		// => ADDRESS
 		else if($message == "📍Manzil") {
 			typing($chat_id);
@@ -507,12 +478,14 @@
 				"reply_markup" => $default
 			]);
 		}
+		*****************************************************/
 		// => CONTACT
 		else if($message == "📲Biz bilan bog'lanish") {
 			typing($chat_id);
-			bot("sendMessage", [
+			bot("sendPhoto", [
 				"chat_id" => $chat_id,
-				"text" => "📥 <b>Biz bilan bog'lanish:</b>\n\n📞 Tel.: <a href=\"tel:998712670027\">+998 71-267-00-27</a>\n🌐 Telegram: <a href=\"https://t.me/uzmia31\">UZMIA</a>",
+				"photo" => UZMIA,
+				"caption" => "📥 <b>Biz bilan bog'lanish:</b>\n\n📞 Tel.: <a href=\"tel:998712670027\">+998 71-267-00-27</a>\n🌐 Telegram: <a href=\"https://t.me/uzmia31\">UZMIA</a>",
 				"parse_mode" => "html",
 				"reply_markup" => $default
 			]);
