@@ -4,12 +4,13 @@
 		$chat_id	= $update -> message -> chat -> id;
 		$first_name	= $update -> message -> from -> first_name;
 		$username	= $update -> message -> chat -> username;
-		$ini_date	= $update -> message -> date;
+		$date		= $update -> message -> date;
+		$date		= date_convert($date);
 		$query		= "SELECT ID FROM USERS WHERE ID = '$chat_id'";
 		$result		= mysqli_query($con, $query);
 		$result		= mysqli_fetch_assoc($result);
 		if(empty($result)) {
-			$query	= "INSERT INTO USERS (CHAT_ID, FIRST_NAME, USERNAME, DATE) VALUES ('$chat_id', '$first_name', '$username', '$ini_date')";
+			$query	= "INSERT INTO USERS (CHAT_ID, FIRST_NAME, USERNAME, DATE) VALUES ('$chat_id', '$first_name', '$username', '$date')";
 			$result	= mysqli_query($con, $query);
 			if(!result)
 				return false;	//ERROR!
@@ -69,5 +70,37 @@
 			"chat_id" => $chat_id,
 			"action" => "typing"
 		]);
+	}
+	function count_users($con) {
+		$query = "SELECT COUNT(CHAT_ID) AS COUNT FROM USERS";
+		$result = mysqli_query($con, $query);
+		$result = mysqli_fetch_assoc($result);
+		return $result;
+	}
+	function count_candidates($con) {
+		$query = "SELECT COUNT(CHAT_ID) AS COUNT FROM CANDIDATES";
+		$result = mysqli_query($con, $query);
+		$result = mysqli_fetch_assoc($result);
+		return $result;
+	}
+	function candidates($con) {
+		$query = "SELECT C.NAME AS NAME, C.AGE AS AGE, C.REGION AS REGION, C.SCHOOL AS SCHOOL, C.LEVEL AS LEVEL, C.PHONE AS PHONE, U.USERNAME AS USERNAME FROM CANDIDATES C JOIN USERS U ON U.CHAT_ID = C.CHAT_ID ORDER BY C.NAME";
+		$result = mysqli_query($con, $query);
+		$table = "";
+		$counter = 1;
+		while($row = mysqli_fetch_assoc($result)) {
+			$table = $table ."<tr>\n";
+			$table = $table ."\t<td>" .$counter ."</td>\n";
+			$table = $table ."\t<td>" .$row["NAME"] ."</td>\n";
+			$table = $table ."\t<td>" .$row["AGE"] ."</td>\n";
+			$table = $table ."\t<td>" .$row["REGION"] ."</td>\n";
+			$table = $table ."\t<td>" .$row["SCHOOL"] ."</td>\n";
+			$table = $table ."\t<td>" .$row["LEVEL"] ."</td>\n";
+			$table = $table ."\t<td>" .$row["PHONE"] ."</td>\n";
+			$table = $table ."\t<td>" ."<a href=\"https://t.me/" .$row['USERNAME'] ."\">@" .$row["USERNAME"] ."</a>" ."</td>\n";
+			$table = $table ."</tr>\n";
+			$counter++;
+		}
+		return $table;
 	}
 ?>
