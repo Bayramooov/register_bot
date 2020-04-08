@@ -497,7 +497,7 @@
 			bot("sendPhoto",	[
 				"chat_id"		=> $chat_id,
 				"photo"			=> UZMIA,
-				"caption"		=> "📥 <b>Biz bilan bog'lanish:</b>\n\n📞 Tel.: <a href=\"tel:998712670027\">+998 71-267-00-27</a>\n🌐 Telegram: <a href=\"https://t.me/uzmia31\">UZMIA</a>",
+				"caption"		=> "📥 <b>Biz bilan bog'lanish:</b>\n\n📞 Tel.: +998 97-776-97-22\n🌐 Telegram: <a href=\"https://t.me/uzmia31\">UZMIA</a>",
 				"parse_mode"	=> "html",
 				"reply_markup"	=> $default
 			]);
