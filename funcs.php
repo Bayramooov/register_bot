@@ -97,10 +97,16 @@
 			$table = $table ."\t<td>" .$row["SCHOOL"] ."</td>\n";
 			$table = $table ."\t<td>" .$row["LEVEL"] ."</td>\n";
 			$table = $table ."\t<td>" .$row["PHONE"] ."</td>\n";
-			$table = $table ."\t<td>" ."<a href=\"https://t.me/" .$row['USERNAME'] ."\">@" .$row["USERNAME"] ."</a>" ."</td>\n";
+			// $table = $table ."\t<td>" ."<a href=\"https://t.me/" .$row['USERNAME'] ."\">@" .$row["USERNAME"] ."</a>" ."</td>\n";
 			$table = $table ."</tr>\n";
 			$counter++;
 		}
 		return $table;
+	}
+	function get_all($con) {
+		$query = "SELECT C.NAME, C.AGE, C.REGION, C.SCHOOL, C.LEVEL, C.PHONE, U.FIRST_NAME AS TELEGRAM_NAME, U.USERNAME, U.DATE AS VIEWED, C.REG_DATE AS REGISTERED, U.CHAT_ID FROM CANDIDATES C JOIN USERS U ON U.CHAT_ID = C.CHAT_ID";
+		$result = mysqli_query($con, $query);
+		if($result->num_rows > 0)
+			return $result;
 	}
 ?>

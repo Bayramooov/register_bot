@@ -7,39 +7,109 @@
 		DB_PASSWORD,
 		DB_NAME
 	);
-	if(!$con)
-		die("Kechirasiz texnik nosozlik sodir bo'ldi. Bu haqda texnik hodimlarga habar jo'natildi. Iltimos birozdan keyin habar oling.");
+	if($con->connect_error)
+		die("Kechirasiz JIDDIY texnik nosozlik sodir bo'ldi. Iltimos texnik hodimlarga habar bering.");
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 	<title>UZMIA - Registration</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+	<style type="text/css">
+		:root {
+			font-size: calc(.6em + .5vw);
+		}
+		.table td, .table th {
+			padding: .4rem;
+		}
+		.table tbody tr {
+			cursor: pointer;
+		}
+		.table tbody td[colspan] {
+			background-color: #f7f7f7;
+			border: 0;
+			padding: 0;
+		}
+		.data_name {
+			font-size: .8rem;
+			color: #333333;
+			font-weight: bold;
+		}
+	</style>
 </head>
 <body>
 	<div class="container">
 		<br/>
 		<h2>Telegram responses</h2>
 		<p>Seen: <?php echo count_users($con)["COUNT"]; ?> times, Registered: <?php echo count_candidates($con)["COUNT"]; ?> candidates</p>            
-		
 		<form method="POST" action="excel.php">
-		  <button class="btn btn-success" type="submit" name="export" value="Export Excel File">Export Excel File</button>
+		  <button class="btn btn-success" type="submit" name="export" value="Export Excel File">Export to Excel</button>
 		</form>
-		<br/>		
-		<table class="table table-hover">
-			<tr>
-				<th></th>
-				<th>NAME</th>
-				<th>AGE</th>
-				<th>REGION</th>
-				<th>SCHOOL</th>
-				<th>LEVEL</th>
-				<th>PHONE</th>
-				<th>USERNAME</th>
-			</tr>
-			<?php echo candidates($con); ?>
-		</table>
+		<br/>	
 
+		<table class="table">
+			<thead>
+				<tr>
+					<th></th>
+					<th>NAME</th>
+					<th>AGE</th>
+					<th>REGION</th>
+					<th>SCHOOL</th>
+					<th>LEVEL</th>
+					<th>PHONE</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php
+					$result = get_all($con);
+					$count = 0;
+					while($row = mysqli_fetch_assoc($result)) {
+						$count++;
+				?>
+				<tr data-toggle="collapse" data-target="#data<?php echo $count; ?>">
+					<td> <?php echo $count; ?> </td>
+					<td> <?php echo $row["NAME"] ?> </td>
+					<td> <?php echo $row["AGE"] ?> </td>
+					<td> <?php echo $row["REGION"] ?> </td>
+					<td> <?php echo $row["SCHOOL"] ?> </td>
+					<td> <?php echo $row["LEVEL"] ?> </td>
+					<td><a href="tel:<?php echo $row['PHONE'] ?>"> <?php echo $row["PHONE"] ?> </a></td>
+				</tr>
+				<!-- COLLAPSE PANEL - TELEGRAM USER INFORMATION -->
+				<tr>
+					<td colspan="7">
+						<div id="data<?php echo $count; ?>" class="collapse">
+							<table class="table">
+								<thead>
+									<tr>
+										<th></th>
+										<th class="data_name"> Telegram name </th>
+										<th class="data_name"> Username </th>
+										<th class="data_name"> Viewed time </th>
+										<th class="data_name"> Registered time </th>
+										<th class="data_name"> Telegram ID </th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td></td>
+										<td> <?php echo $row["TELEGRAM_NAME"] ?> </td>
+										<td><a href="https://t.me/<?php echo $row['USERNAME'] ?>">@<?php echo $row["USERNAME"] ?></a></td>
+										<td> <?php echo $row["VIEWED"] ?> </td>
+										<td> <?php echo $row["REGISTERED"] ?> </td>
+										<td> <?php echo $row["CHAT_ID"] ?> </td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</td>
+				</tr>
+			<?php } ?>				
+			</tbody>
+		</table>
 	</div>
 </body>
 </html>
