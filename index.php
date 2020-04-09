@@ -35,8 +35,11 @@
 		}
 		.data_name {
 			font-size: .8rem;
-			color: #333333;
+			color: #999;
 			font-weight: bold;
+		}
+		.hide-error {
+			display: none;
 		}
 	</style>
 </head>
@@ -63,20 +66,22 @@
 				</tr>
 			</thead>
 			<tbody>
+				<div class="hide-error">
 				<?php
 					$result = get_all($con);
 					$count = 0;
 					while($row = mysqli_fetch_assoc($result)) {
 						$count++;
 				?>
+				</div>
 				<tr data-toggle="collapse" data-target="#data<?php echo $count; ?>">
 					<td> <?php echo $count; ?> </td>
-					<td> <?php echo $row["NAME"] ?> </td>
-					<td> <?php echo $row["AGE"] ?> </td>
-					<td> <?php echo $row["REGION"] ?> </td>
-					<td> <?php echo $row["SCHOOL"] ?> </td>
-					<td> <?php echo $row["LEVEL"] ?> </td>
-					<td><a href="tel:<?php echo $row['PHONE'] ?>"> <?php echo $row["PHONE"] ?> </a></td>
+					<td> <?php echo $row["NAME"]; ?> </td>
+					<td> <?php echo $row["AGE"]; ?> </td>
+					<td> <?php echo $row["REGION"]; ?> </td>
+					<td> <?php echo $row["SCHOOL"]; ?> </td>
+					<td> <?php echo $row["LEVEL"]; ?> </td>
+					<td><a href="tel:<?php echo $row['PHONE']; ?>"> <?php echo read_phone($row["PHONE"]); ?> </a></td>
 				</tr>
 				<!-- COLLAPSE PANEL - TELEGRAM USER INFORMATION -->
 				<tr>
@@ -97,10 +102,10 @@
 									<tr>
 										<td></td>
 										<td> <?php echo $row["TELEGRAM_NAME"] ?> </td>
-										<td><a href="https://t.me/<?php echo $row['USERNAME'] ?>">@<?php echo $row["USERNAME"] ?></a></td>
-										<td> <?php echo $row["VIEWED"] ?> </td>
-										<td> <?php echo $row["REGISTERED"] ?> </td>
-										<td> <?php echo $row["CHAT_ID"] ?> </td>
+										<td><a href="https://t.me/<?php echo $row['USERNAME']; ?>">@<?php echo $row["USERNAME"]; ?></a></td>
+										<td> <?php echo $row["VIEWED"]; ?> </td>
+										<td> <?php echo $row["REGISTERED"]; ?> </td>
+										<td> <?php echo $row["CHAT_ID"]; ?> </td>
 									</tr>
 								</tbody>
 							</table>

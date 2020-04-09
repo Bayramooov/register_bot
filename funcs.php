@@ -109,4 +109,14 @@
 		if($result->num_rows > 0)
 			return $result;
 	}
+	function phone_filter($phone) {
+		if(strlen($phone) == 9)
+			return "+998" .$phone;
+		else if(strlen($phone) == 12)
+			if(substr($phone, 0, 3) == "998")
+				return "+" .$phone;
+	}
+	function read_phone($phone) {
+		return substr($phone, 0, 4) ." " .substr($phone, 4, 2) ."-" .substr($phone, 6, 3) ."-" .substr($phone, 9, 2) ."-" .substr($phone, 11, 2);
+	}
 ?>

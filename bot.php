@@ -328,6 +328,8 @@
 			}
 			// => PHONE
 			else if($step == "5") {
+				$message = preg_replace("/[^0-9]+/", "", $message);
+				$phone = phone_filter($message); 
 				if($message == "Bekor qilish") {
 					delete_files("temp/$chat_id");
 					typing($chat_id);
@@ -337,9 +339,9 @@
 						"parse_mode"	=> "markdown",
 						"reply_markup"	=> $default
 					]);
-				} else if(preg_match($phone_pattern, $message)) {
+				} else if(isset($phone)) {
 					file_put_contents("temp/$chat_id/step.log", "6");
-					file_put_contents("temp/$chat_id/phone.log", $message);
+					file_put_contents("temp/$chat_id/phone.log", $phone);
 					$name	= file_get_contents("temp/$chat_id/name.log");
 					$age	= file_get_contents("temp/$chat_id/age.log");
 					$region	= file_get_contents("temp/$chat_id/region.log");
@@ -357,9 +359,9 @@
 					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
-						"text"			=> "Noto'g'ri format.\nFaqat sonlardan foydalanish mumkin!",
+						"text"			=> "Noto'g'ri format.\nTelefon raqamini to'g'ri kiriting!",
 						"parse_mode"	=> "markdown",
-						"reply_markup"	=> $submit
+						"reply_markup"	=> $cancel
 					]);
 				}
 			}
