@@ -3,7 +3,9 @@
 	function add_user($con, $update) {
 		$chat_id	= $update -> message -> chat -> id;
 		$first_name	= $update -> message -> from -> first_name;
+		$first_name = mysqli_real_escape_string($con, $first_name);
 		$username	= $update -> message -> chat -> username;
+		$username	= mysqli_real_escape_string($con, $username);
 		$date		= $update -> message -> date;
 		$date		= date_convert($date);
 		$query		= "SELECT ID FROM USERS WHERE ID = '$chat_id'";
@@ -20,9 +22,11 @@
 	}
 	function add_candidate($con, $chat_id, $date) {
 		$name	= file_get_contents("temp/$chat_id/name.log");
+		$name	= mysqli_real_escape_string($con, $name);
 		$age	= file_get_contents("temp/$chat_id/age.log");
 		$region	= file_get_contents("temp/$chat_id/region.log");
 		$school	= file_get_contents("temp/$chat_id/school.log");
+		$school	= mysqli_real_escape_string($con, $school);;
 		$level	= file_get_contents("temp/$chat_id/level.log");
 		$phone	= file_get_contents("temp/$chat_id/phone.log");
 		delete_files("temp/$chat_id");
