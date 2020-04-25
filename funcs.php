@@ -25,6 +25,7 @@
 		$name	= mysqli_real_escape_string($con, $name);
 		$age	= file_get_contents("temp/$chat_id/age.log");
 		$region	= file_get_contents("temp/$chat_id/region.log");
+		$region	= mysqli_real_escape_string($con, $region);
 		$school	= file_get_contents("temp/$chat_id/school.log");
 		$school	= mysqli_real_escape_string($con, $school);;
 		$level	= file_get_contents("temp/$chat_id/level.log");
@@ -127,5 +128,29 @@
 		$result = mysqli_query($con, $query);
 		if($result->num_rows > 0)
 			return $result;
+	}
+	function count_non_reg($con) {
+		$query = "SELECT COUNT(U.CHAT_ID) AS COUNT FROM USERS U WHERE U.CHAT_ID NOT IN(SELECT C.CHAT_ID FROM CANDIDATES C)";
+		$result = mysqli_query($con, $query);
+		$result = mysqli_fetch_assoc($result);
+		return $result;
+	}
+	function group_region($con) {
+		$query = "SELECT COUNT(ID) AS NUMBER, REGION FROM CANDIDATES GROUP BY REGION ORDER BY NUMBER DESC";
+		$result = mysqli_query($con, $query);
+		// $result = mysqli_fetch_assoc($result);
+		return $result;
+	}
+	function group_level($con) {
+		$query = "SELECT COUNT(ID) AS NUMBER, LEVEL FROM CANDIDATES GROUP BY LEVEL ORDER BY NUMBER DESC";
+		$result = mysqli_query($con, $query);
+		// $result = mysqli_fetch_assoc($result);
+		return $result;
+	}
+	function group_age($con) {
+		$query = "SELECT COUNT(ID) AS NUMBER, AGE FROM CANDIDATES GROUP BY AGE ORDER BY AGE";
+		$result = mysqli_query($con, $query);
+		// $result = mysqli_fetch_assoc($result);
+		return $result;
 	}
 ?>
