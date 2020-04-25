@@ -9,106 +9,260 @@
 	);
 	if($con->connect_error)
 		die("Kechirasiz JIDDIY texnik nosozlik sodir bo'ldi. Iltimos texnik hodimlarga habar bering.");
+
+	// REGION
+	$data1 = group_region($con);
+	$region = array();
+	$region["Toshkent shahri"] = 0;
+	$region["Toshkent viloyati"] = 0;
+	$region["Andijon"] = 0;
+	$region["Buxoro"] = 0;
+	$region["Jizzax"] = 0;
+	$region["Farg'ona"] = 0;
+	$region["Qashqadaryo"] = 0;
+	$region["Xorazm"] = 0;
+	$region["Namangan"] = 0;
+	$region["Navoiy"] = 0;
+	$region["Samarqand"] = 0;
+	$region["Surxondaryo"] = 0;
+	$region["Sirdaryo"] = 0;
+	$region["Qoraqalpog'iston"] = 0;
+	while($value = mysqli_fetch_assoc($data1)) {
+		$region[$value['REGION']] = $value['NUMBER'];
+	}
+
+	// LEVEL
+	$data2 = group_level($con);
+	$level = array();
+	$level["9 - sinf"] = 0;
+	$level["10 - sinf"] = 0;
+	$level["11 - sinf"] = 0;
+	$level["Talaba"] = 0;
+	while($value = mysqli_fetch_assoc($data2)) {
+		$level[$value['LEVEL']] = $value['NUMBER'];
+	}
+	// AGE
+	$data3 = group_age($con);
+	$age = array();
+	while($value = mysqli_fetch_assoc($data3)) {
+		$age[$value['AGE']] = $value['NUMBER'];
+	}
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-	<title>UZMIA - Registration</title>
+	<title>Uzmia | Dashboard</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+	<link rel="stylesheet" type="text/css" href="style.css">
 	<style type="text/css">
 		:root {
 			font-size: calc(.4em + .5vw);
 		}
-		.table td, .table th {
-			padding: .3rem;
-		}
-		.table tbody tr {
-			cursor: pointer;
-		}
-		.table tbody td[colspan] {
-			background-color: #f7f7f7;
-			border: 0;
-			padding: 0;
-		}
-		.data_name {
-			font-size: .8rem;
-			color: #999;
-			font-weight: bold;
-		}
 		.hide-error {
 			display: none;
+		}
+		.chart-container {
+			display: flex;
+			justify-content: space-around;
+			align-items: center;
+			align-content: space-around;
+			flex-wrap: wrap;
+			margin: 0 auto;
 		}
 	</style>
 </head>
 <body>
 	<div class="container">
 		<br/>
-		<h2>Telegram responses</h2>
-		<p>Seen: <?php echo count_users($con)["COUNT"]; ?> times, Registered: <?php echo count_candidates($con)["COUNT"]; ?> candidates</p>            
+		<h2>Uzmia Statistics</h2>
+		<p>Total: <?php echo count_users($con)["COUNT"]; ?> users, Registered: <?php echo count_candidates($con)["COUNT"]; ?> candidates, Not Registered: <?php echo count_non_reg($con)["COUNT"]; ?> viewers</p>            
 		<form method="POST" action="excel.php">
 		  <button class="btn btn-success" type="submit" name="export" value="Export Excel File">Export to Excel</button>
+		  <a class="btn btn-success" href="table.php">View Table</a>
 		</form>
-		<br/>	
-
-		<table class="table">
-			<thead>
-				<tr>
-					<th></th>
-					<th>NAME</th>
-					<th>AGE</th>
-					<th>REGION</th>
-					<th>LEVEL</th>
-					<th>PHONE</th>
-				</tr>
-			</thead>
-			<tbody>
-				<div class="hide-error">
-				<?php
-					$result = get_all($con);
-					$count = 0;
-					while($row = mysqli_fetch_assoc($result)) {
-						$count++;
-				?>
-				</div>
-				<tr data-toggle="collapse" data-target="#data<?php echo $count; ?>">
-					<td><?php echo $count; ?></td>
-					<td><?php echo $row["NAME"]; ?></td>
-					<td><?php echo $row["AGE"]; ?></td>
-					<td><?php echo $row["REGION"]; ?></td>
-					<td><?php echo $row["LEVEL"]; ?></td>
-					<td><a href="tel:<?php echo $row['PHONE']; ?>"> <?php echo read_phone($row["PHONE"]); ?> </a></td>
-				</tr>
-				<!-- COLLAPSE PANEL - TELEGRAM USER INFORMATION -->
-				<tr>
-					<td colspan="6">
-						<div id="data<?php echo $count; ?>" class="collapse">
-							<table class="table">
-								<thead>
-									<tr>
-										<th></th>
-										<th class="data_name">Username</th>
-										<th class="data_name">Registered time</th>
-										<th class="data_name">School</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td></td>
-										<td><a href="https://t.me/<?php echo $row['USERNAME']; ?>">@<?php echo $row["USERNAME"]; ?></a></td>
-										<td><?php echo $row["REGISTERED"]; ?></td>
-										<td><?php echo $row["SCHOOL"]; ?></td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</td>
-				</tr>
-			<?php } ?>				
-			</tbody>
-		</table>
+		<br/>
+		<br/>
+		<div class="chart-container">
+			<canvas id="region" height="500" width="450px"></canvas>
+			<canvas id="level" height="450" width="400px"></canvas>
+			<canvas id="age" height="500" width="600px"></canvas>
+			<!-- <canvas id="time" height="500" width="600px"></canvas> -->
+		</div>
 	</div>
+	<!-- CHART JS -->
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+	<script type="text/javascript">
+		var level_data = {
+		  labels: [
+		  	"9-sinf",
+		  	"10-sinf",
+		  	"11-sinf",
+		  	"Talaba"
+		  ],
+		  datasets: [{
+		    data: [
+		    	<?php echo $level["9 - sinf"] ?>,
+		    	<?php echo $level["10 - sinf"] ?>,
+		    	<?php echo $level["11 - sinf"] ?>,
+		    	<?php echo $level["Talaba"] ?>
+		    ],
+		    backgroundColor: [
+		    	"rgba(5,47,95,0.4)",
+		    	"rgba(6,167,125,0.4)",
+		    	"rgba(99,105,209,0.4)",
+		    	"rgba(241,162,8,0.4)"
+		    ],
+		    borderColor: [
+		    	"rgba(5,47,95,1)",
+		    	"rgba(6,167,125,1)",
+		    	"rgba(99,105,209,1)",
+		    	"rgba(241,162,8,1)"
+		    ],
+		    borderWidth: 2,
+		    hoverBackgroundColor: [
+		    	"rgba(0,255,0,0.4)",
+		    	"rgba(0,255,0,0.4)",
+		    	"rgba(0,255,0,0.4)",
+		    	"rgba(0,255,0,0.4)",
+			],
+		    hoverBorderColor: "rgba(0,255,0,1)",
+		  }]
+		};
+
+		var level_option = {
+		  responsive: false,
+		  responsiveAnimationDuration: 750,
+		  maintainAspectRatio: true,
+		};
+
+		var region_data = {
+		  labels: [
+		  	"Toshkent shahri",
+		  	"Toshkent viloyati",
+		  	"Andijon",
+		  	"Buxoro",
+		  	"Jizzax",
+		  	"Farg'ona", 
+		  	"Qashqadaryo",
+		  	"Xorazm",
+		  	"Namangan",
+		  	"Navoiy",
+		  	"Samarqand",
+		  	"Surxondaryo",
+		  	"Sirdaryo",
+		  	"Qoraqalpog'iston"
+		  ],
+		  datasets: [{
+		    label: "Viloyatlar",
+		    backgroundColor: "rgba(65,164,10,0.4)",
+		    borderColor: "rgba(76,169,8,1)",
+		    borderWidth: 2,
+		    hoverBackgroundColor: "rgba(0,255,0,0.4)",
+		    hoverBorderColor: "rgba(0,255,0,1)",
+		    data: [
+		    	<?php echo $region["Toshkent shahri"] ?>,
+		    	<?php echo $region["Toshkent viloyati"] ?>,
+		    	<?php echo $region["Andijon"] ?>,
+		    	<?php echo $region["Buxoro"] ?>,
+		    	<?php echo $region["Jizzax"] ?>,
+		    	<?php echo $region["Farg'ona"] ?>,
+		    	<?php echo $region["Qashqadaryo"] ?>,
+		    	<?php echo $region["Xorazm"] ?>,
+		    	<?php echo $region["Namangan"] ?>,
+		    	<?php echo $region["Navoiy"] ?>,
+		    	<?php echo $region["Samarqand"] ?>,
+		    	<?php echo $region["Surxondaryo"] ?>,
+		    	<?php echo $region["Sirdaryo"] ?>,
+		    	<?php echo $region["Qoraqalpog'iston"] ?>
+		    ],
+		  }]
+		};
+
+		var region_option = {
+		  responsive: false,
+		  responsiveAnimationDuration: 750,
+		  maintainAspectRatio: true,
+		  scales: {
+		    yAxes: [{
+		      stacked: true,
+		      gridLines: {
+		        display: true,
+		        color: "rgba(255,99,132,0.2)"
+		      }
+		    }],
+		    xAxes: [{
+		      gridLines: {
+		        display: false
+		      }
+		    }]
+		  }
+		};
+
+		var age_data = {
+		  labels: [
+		  	<?php
+		  		foreach ($age as $key => $value) {
+		  			echo $key .",";
+		  		}
+		  	?>
+		  ],
+
+		  datasets: [{
+		    data: [
+		  	<?php
+		  		foreach ($age as $key => $value) {
+		  			echo $value .",";
+		  		}
+		  	?>
+		    ],
+
+		    label: "Ishtirokchilarning Yoshlari",
+		    fill: true,
+		    lineTension: .5,
+		    pointRadius: 3,
+		    showLine: true,
+
+		    backgroundColor: [
+		    	"rgba(255,99,0,0.2)",
+		    ],
+		    borderColor: [
+		    	"rgba(255,99,0,.5)"
+		    ],
+		    borderWidth: 2,
+		    hoverBackgroundColor: [
+		    	"rgba(255,99,132,0.4)",
+		    	"rgba(255,99,132,0.4)",
+		    	"rgba(255,99,132,0.4)",
+		    	"rgba(255,99,132,0.4)"
+			],
+		    hoverBorderColor: "rgba(255,99,132,10)",
+		  }]
+		};
+
+		var age_option = {
+		  responsive: false,
+		  responsiveAnimationDuration: 750,
+		  maintainAspectRatio: true,
+		  scales: {
+		    yAxes: [{
+		      stacked: true,
+		      gridLines: {
+		        display: true,
+		        color: "rgba(255,99,132,0.2)"
+		      }
+		    }],
+		    xAxes: [{
+		      gridLines: {
+		        display: false
+		      }
+		    }]
+		  }
+		};
+
+		// new Chart('time', {type: 'doughnut', options: time_option,  data: time_data} );
+		new Chart('region', {type: 'bar', options: region_option,  data: region_data} );
+		new Chart('level', {type: 'doughnut', options: level_option,  data: level_data} );
+		new Chart('age', {type: 'line', options: age_option,  data: age_data} );
+	</script>
 </body>
 </html>
