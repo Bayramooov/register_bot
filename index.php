@@ -20,10 +20,10 @@
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 	<style type="text/css">
 		:root {
-			font-size: calc(.6em + .5vw);
+			font-size: calc(.4em + .5vw);
 		}
 		.table td, .table th {
-			padding: .4rem;
+			padding: .3rem;
 		}
 		.table tbody tr {
 			cursor: pointer;
@@ -60,7 +60,6 @@
 					<th>NAME</th>
 					<th>AGE</th>
 					<th>REGION</th>
-					<th>SCHOOL</th>
 					<th>LEVEL</th>
 					<th>PHONE</th>
 				</tr>
@@ -75,37 +74,32 @@
 				?>
 				</div>
 				<tr data-toggle="collapse" data-target="#data<?php echo $count; ?>">
-					<td> <?php echo $count; ?> </td>
-					<td> <?php echo $row["NAME"]; ?> </td>
-					<td> <?php echo $row["AGE"]; ?> </td>
-					<td> <?php echo $row["REGION"]; ?> </td>
-					<td> <?php echo $row["SCHOOL"]; ?> </td>
-					<td> <?php echo $row["LEVEL"]; ?> </td>
+					<td><?php echo $count; ?></td>
+					<td><?php echo $row["NAME"]; ?></td>
+					<td><?php echo $row["AGE"]; ?></td>
+					<td><?php echo $row["REGION"]; ?></td>
+					<td><?php echo $row["LEVEL"]; ?></td>
 					<td><a href="tel:<?php echo $row['PHONE']; ?>"> <?php echo read_phone($row["PHONE"]); ?> </a></td>
 				</tr>
 				<!-- COLLAPSE PANEL - TELEGRAM USER INFORMATION -->
 				<tr>
-					<td colspan="7">
+					<td colspan="6">
 						<div id="data<?php echo $count; ?>" class="collapse">
 							<table class="table">
 								<thead>
 									<tr>
 										<th></th>
-										<th class="data_name"> Telegram name </th>
-										<th class="data_name"> Username </th>
-										<th class="data_name"> Viewed time </th>
-										<th class="data_name"> Registered time </th>
-										<th class="data_name"> Telegram ID </th>
+										<th class="data_name">Username</th>
+										<th class="data_name">Registered time</th>
+										<th class="data_name">School</th>
 									</tr>
 								</thead>
 								<tbody>
 									<tr>
 										<td></td>
-										<td> <?php echo $row["TELEGRAM_NAME"] ?> </td>
 										<td><a href="https://t.me/<?php echo $row['USERNAME']; ?>">@<?php echo $row["USERNAME"]; ?></a></td>
-										<td> <?php echo $row["VIEWED"]; ?> </td>
-										<td> <?php echo $row["REGISTERED"]; ?> </td>
-										<td> <?php echo $row["CHAT_ID"]; ?> </td>
+										<td><?php echo $row["REGISTERED"]; ?></td>
+										<td><?php echo $row["SCHOOL"]; ?></td>
 									</tr>
 								</tbody>
 							</table>
