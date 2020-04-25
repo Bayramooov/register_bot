@@ -101,14 +101,13 @@
 			$table = $table ."\t<td>" .$row["SCHOOL"] ."</td>\n";
 			$table = $table ."\t<td>" .$row["LEVEL"] ."</td>\n";
 			$table = $table ."\t<td>" .$row["PHONE"] ."</td>\n";
-			// $table = $table ."\t<td>" ."<a href=\"https://t.me/" .$row['USERNAME'] ."\">@" .$row["USERNAME"] ."</a>" ."</td>\n";
 			$table = $table ."</tr>\n";
 			$counter++;
 		}
 		return $table;
 	}
 	function get_all($con) {
-		$query = "SELECT C.NAME, C.AGE, C.REGION, C.SCHOOL, C.LEVEL, C.PHONE, U.FIRST_NAME AS TELEGRAM_NAME, U.USERNAME, U.DATE AS VIEWED, C.REG_DATE AS REGISTERED, U.CHAT_ID FROM CANDIDATES C JOIN USERS U ON U.CHAT_ID = C.CHAT_ID";
+		$query = "SELECT C.NAME, C.AGE, C.REGION, C.SCHOOL, C.LEVEL, C.PHONE, U.FIRST_NAME AS TELEGRAM_NAME, U.USERNAME, U.DATE AS VIEWED, C.REG_DATE AS REGISTERED, U.CHAT_ID FROM CANDIDATES C JOIN USERS U ON U.CHAT_ID = C.CHAT_ID ORDER BY REGISTERED DESC";
 		$result = mysqli_query($con, $query);
 		if($result->num_rows > 0)
 			return $result;
@@ -122,5 +121,11 @@
 	}
 	function read_phone($phone) {
 		return substr($phone, 0, 4) ." " .substr($phone, 4, 2) ."-" .substr($phone, 6, 3) ."-" .substr($phone, 9, 2) ."-" .substr($phone, 11, 2);
+	}
+	function not_registered_viewers($con) {
+		$query = "SELECT U.FIRST_NAME AS TELEGRAM_NAME, U.USERNAME, U.DATE AS VIEWED, U.CHAT_ID FROM USERS U WHERE U.CHAT_ID NOT IN(SELECT C.CHAT_ID FROM CANDIDATES C) ORDER BY DATE DESC";
+		$result = mysqli_query($con, $query);
+		if($result->num_rows > 0)
+			return $result;
 	}
 ?>
