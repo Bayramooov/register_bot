@@ -95,6 +95,7 @@
 			],
 			[
 				//["text" => "📍Manzil"],
+				["text" => "📜Olimpiada shartlari"],
 				["text" => "📲Biz bilan bog'lanish"]
 			]
 		]
@@ -469,7 +470,15 @@
 			typing($chat_id);
 			bot("sendMessage",	[
 				"chat_id"		=> $chat_id,
-				"text"			=> "<b>\"O'zbekiston Yoshlar Ittifoqi\"</b> va <b>\"O'zbekiston Matematiklar va Informatika Assotsiatsiyasi\"</b> tashabbusi bilan birga tashkil etilgan onlayn matematika olimpiadasi qabuliga xush kelibsiz!",
+				"text"			=> "<b>\"O'zbekiston Yoshlar Ittifoqi\"</b>, <b>\"Muhammad al-Xorazmiy nomidagi axborot texnologiyalariga ixtisoslashgan maktab\"</b> va <b>\"O'zbekiston Matematiklar va Informatika Assotsiatsiyasi\"</b> tashabbusi bilan birga tashkil etilgan onlayn matematika olimpiadasi qabuliga xush kelibsiz!",
+				"parse_mode"	=> "html",
+				"reply_markup"	=> $default
+			]);
+			typing($chat_id);
+			bot("sendDocument",	[
+				"chat_id"		=> $chat_id,
+				"document"		=> "BQACAgIAAxkBAAIByl6bTm4tlKO7gDBktdPhdBL2Jbl3AAJIBwACIA3ZSMSPIy4qnYo3GAQ",
+				"caption"		=> "<b>📜 Ro'yxatdan o'tishdan avval iltimos ushbu ma'lumotlar bilan yaqindan tanishib chiqing!</b>",
 				"parse_mode"	=> "html",
 				"reply_markup"	=> $default
 			]);
@@ -493,6 +502,19 @@
 			]);
 		}
 		*****************************************************/
+
+		// => RULES
+		else if($message == "📜Olimpiada shartlari") {
+			typing($chat_id);
+			bot("sendDocument",	[
+				"chat_id"		=> $chat_id,
+				"document"		=> "BQACAgIAAxkBAAIByl6bTm4tlKO7gDBktdPhdBL2Jbl3AAJIBwACIA3ZSMSPIy4qnYo3GAQ",
+				"caption"		=> "<b>📜 Iltimos ushbu ma'lumotlar bilan yaqindan tanishib chiqing!</b>",
+				"parse_mode"	=> "html",
+				"reply_markup"	=> $default
+			]);
+		}
+
 		// => CONTACT
 		else if($message == "📲Biz bilan bog'lanish") {
 			typing($chat_id);
