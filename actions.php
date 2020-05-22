@@ -25,7 +25,7 @@
 		}
 		foreach ($chat_id as $value) {
 			$result = array();
-			$request = URL .API_KEY ."/sendMessage?chat_id=" .$value ."&text=" .$message ."&parse_mode=html";
+			$request = SEND_MESSAGE ."?chat_id=" .$value ."&text=" .$message ."&parse_mode=html";
 			$result = json_decode(file_get_contents($request), true);
 			sleep(0.05);
 			if($result['ok'] == true) {
