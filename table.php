@@ -1,5 +1,5 @@
 <?php
-	require_once("private.php");
+	require_once("settings.php");
 	require_once("funcs.php");
 	$con = mysqli_connect(
 		DB_HOST,
@@ -112,3 +112,4 @@
 	</div>
 </body>
 </html>
+<?php mysqli_close($con); ?>

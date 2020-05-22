@@ -1,5 +1,5 @@
 <?php
-	require_once("private.php");
+	require_once("settings.php");
 	function add_user($con, $update) {
 		$chat_id	= $update -> message -> chat -> id;
 		$first_name	= $update -> message -> from -> first_name;
@@ -152,5 +152,10 @@
 		$result = mysqli_query($con, $query);
 		// $result = mysqli_fetch_assoc($result);
 		return $result;
+	}
+
+	function offset($offset_value) {
+		$update = json_decode(file_get_contents(GET_UPDATES."?offset=".$offset_value), true);
+		return $update;
 	}
 ?>
