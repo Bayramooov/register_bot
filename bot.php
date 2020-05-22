@@ -1,5 +1,5 @@
 <?php
-	require_once("private.php");
+	require_once("settings.php");
 	require_once("funcs.php");
 	/***********************************************
 		#PREDEFINED CONSTANTS FROM PRIVATE.PHP
@@ -8,14 +8,6 @@
 			DB_PASSWORD
 			DB_NAME
 			API_KEY
-
-		#PREDEFINED FUNCTIONS FROM FUNCS.PHP
-			add_user($con, $update);
-			add_candidate($con, $chat_id, $date);
-			date_convert($date);
-			delete_files($location);
-			bot($method, $datas=[]);
-			typing($chat_id);
 	***********************************************/
 	//	WEBHOOK
 	$update = json_decode(file_get_contents("php://input"));
@@ -52,15 +44,6 @@
 		die();
 	}
 	//////////////////////////////////////// EXCEPTION HANGLING ////////////////////////////////////////
-	/*********************
-		#VARIABLES
-			NAME
-			AGE
-			REGION
-			SCHOOL
-			LEVEL
-			PHONE
-	*********************/
 	// VALIDATION
 	$age_pattern = "/^\d\d$/";
 	$is_region =
@@ -177,7 +160,6 @@
 			if(!is_dir("temp/$chat_id"))
 				mkdir("temp/$chat_id");	
 			file_put_contents("temp/$chat_id/step.log", "0");
-			typing($chat_id);
 			bot("sendMessage",	[
 				"chat_id"		=> $chat_id,
 				"text"			=> "Ism sharifingizni kiriting:",
@@ -192,7 +174,6 @@
 			if($step == "0") {
 				if($message == "Bekor qilish") {
 					delete_files("temp/$chat_id");
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Ro'yxat bekor qilindi!",
@@ -202,7 +183,6 @@
 				} else {
 					file_put_contents("temp/$chat_id/step.log", "1");
 					file_put_contents("temp/$chat_id/name.log", $message);
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Yoshingiz nechada?",
@@ -215,7 +195,6 @@
 			else if($step == "1") {
 				if($message == "Bekor qilish") {
 					delete_files("temp/$chat_id");
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Ro'yxat bekor qilindi!",
@@ -225,7 +204,6 @@
 				} else if(preg_match($age_pattern, $message)) {
 					file_put_contents("temp/$chat_id/step.log", "2");
 					file_put_contents("temp/$chat_id/age.log", $message);
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Iltimos Shahringizni tanlang.\nQuyidagi tugmalardan birini bosing.",
@@ -233,7 +211,6 @@
 						"reply_markup"	=> $regions
 					]);
 				} else {
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Noto'g'ri format!\nIltimos faqat raqamlar bilan yozing!",
@@ -246,7 +223,6 @@
 			else if($step == "2") {
 				if($message == "Bekor qilish") {
 					delete_files("temp/$chat_id");
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Ro'yxat bekor qilindi!",
@@ -256,7 +232,6 @@
 				} else if($is_region) {
 					file_put_contents("temp/$chat_id/step.log", "3");
 					file_put_contents("temp/$chat_id/region.log", $message);
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Toifangizni tanlang.\nQuyidagi tugmalardan birini bosing.",
@@ -264,7 +239,6 @@
 						"reply_markup"	=> $level
 					]);
 				} else {
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Noto'g'ri format.\nIltimos quyidagi tugmalardan birini bosing!",
@@ -277,7 +251,6 @@
 			else if($step == "3") {
 				if($message == "Bekor qilish") {
 					delete_files("temp/$chat_id");
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Ro'yxat bekor qilindi!",
@@ -287,7 +260,6 @@
 				} else if($is_level) {
 					file_put_contents("temp/$chat_id/step.log", "4");
 					file_put_contents("temp/$chat_id/level.log", $message);
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Iltimos o'quv muassassangizning nomini kiriting.",
@@ -295,7 +267,6 @@
 						"reply_markup"	=> $cancel
 					]);
 				} else {
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Noto'g'ri format.\nIltimos quyidagi tugmalardan birini bosing!",
@@ -308,7 +279,6 @@
 			else if($step == "4") {
 				if($message == "Bekor qilish") {
 					delete_files("temp/$chat_id");
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Ro'yxat bekor qilindi!",
@@ -318,7 +288,6 @@
 				} else {
 					file_put_contents("temp/$chat_id/step.log", "5");
 					file_put_contents("temp/$chat_id/school.log", $message);
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Telefon raqamingizni kiriting",
@@ -333,7 +302,6 @@
 				$phone = phone_filter($message); 
 				if($message == "Bekor qilish") {
 					delete_files("temp/$chat_id");
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Ro'yxat bekor qilindi!",
@@ -349,7 +317,6 @@
 					$level	= file_get_contents("temp/$chat_id/level.log");
 					$school	= file_get_contents("temp/$chat_id/school.log");
 					$phone	= file_get_contents("temp/$chat_id/phone.log");
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "<b>Malumotlarni Tasdiqlaysizmi?</b>\n1. F.I.Sh: <b><i>$name</i></b>\n2. Yoshingiz: <b><i>$age</i></b>\n3. Shahringiz: <b><i>$region</i></b>\n4. Toifangiz: <b><i>$level</i></b>\n5. O'quv muassassasi: <b><i>$school</i></b>\n6. Telefon raqamingiz: <b><i>$phone</i></b>",
@@ -357,7 +324,6 @@
 						"reply_markup"	=> $submit
 					]);
 				} else {
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Noto'g'ri format.\nTelefon raqamini to'g'ri kiriting!",
@@ -370,7 +336,6 @@
 			else if($step == "6") {
 				if($message == "Bekor qilish") {
 					delete_files("temp/$chat_id");
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Ro'yxat bekor qilindi!",
@@ -378,23 +343,15 @@
 						"reply_markup"	=> $default
 					]);
 				} else if($message == "Tasdiqlash") {
-					bot("sendMessage",	[
-						"chat_id"		=> "1213750558",	// ADMIN
-						"text"			=> "+New Candidate\n@$username",
-						"parse_mode"	=> "html",
-						"reply_markup"	=> $default
-					]);
 					switch (add_candidate($con, $chat_id, $date)) {
 						////////////////////////// EXCEPTION HANGLING //////////////////////////
 						case '0':
-							typing($chat_id);
 							bot("sendMessage",	[
 								"chat_id"		=> $chat_id,
 								"text"			=> "Kechirasiz texnik nosozlik sodir bo'ldi va ro'yxat bekor qilindi. Bu haqda texnik hodimlarga habar jo'natildi. Iltimos birozdan keyin qayta ro'yxatdan o'ting.",
 								"parse_mode"	=> "markdown",
 								"reply_markup"	=> $default
 							]);
-							typing("373537481");
 							bot("sendMessage",	[
 								"chat_id"		=> "373537481",	//ADMIN
 								"text"			=> "<b>ADD_CANDIDATE(); FAILED!</b>\n\nCHAT_ID: <b><i>$chat_id</i></b>\nName: <b><i>$first_name</i></b>\nUsername: <b><i>@$username</i></b>\nTime: <b><i>$date</i></b>\nMessage:\n\n<b><i>$message</i></b>",
@@ -404,7 +361,6 @@
 							die();
 						////////////////////////// EXCEPTION HANGLING //////////////////////////
 						case '1':
-							typing($chat_id);
 							bot("sendMessage",	[
 								"chat_id"		=> $chat_id,
 								"text"			=> "⚠️ Siz ro'yxatdan o'tib bo'lgansiz!",
@@ -413,7 +369,6 @@
 							]);
 							break;
 						case '2':
-							typing($chat_id);
 							bot("sendMessage",	[
 								"chat_id"		=> $chat_id,
 								"text"			=> "✅ Ro'yxatdan o'tish muvaffaqiyatli yakunlandi!",
@@ -423,7 +378,6 @@
 					}
 					
 				} else {
-					typing($chat_id);
 					bot("sendMessage",	[
 						"chat_id"		=> $chat_id,
 						"text"			=> "Iltimos quyidagi tugmalardan birini bosing!",
@@ -435,29 +389,20 @@
 		}
 		// => /START
 		else if($message == "/start") {
-			typing($chat_id);
 			bot("sendMessage",	[
 				"chat_id"		=> $chat_id,
 				"text"			=> "Assalomu Alaykum!",
 				"parse_mode"	=> "markdown",
 				"reply_markup"	=> $default
 			]);
-			bot("sendMessage",	[
-				"chat_id"		=> "1213750558",	// ADMIN
-				"text"			=> "+New User\n@$username",
-				"parse_mode"	=> "html",
-				"reply_markup"	=> $default
-			]);
 			//////////////////////////////////////// EXCEPTION HANGLING ////////////////////////////////////////
 			if(!add_user($con, $update)) {
-				typing($chat_id);
 				bot("sendMessage",	[
 					"chat_id"		=> $chat_id,
 					"text"			=> "Kechirasiz texnik nosozlik sodir bo'ldi. Bu haqda texnik hodimlarga habar jo'natildi. Iltimos birozdan keyin habar oling.",
 					"parse_mode"	=> "markdown",
 					"reply_markup"	=> $default
 				]);
-				typing("373537481");
 				bot("sendMessage",	[
 					"chat_id"		=> "373537481",	//ADMIN
 					"text"			=> "<b>ADD_USER(); FAILED!</b>\n\nCHAT_ID: <b><i>$chat_id</i></b>\nName: <b><i>$first_name</i></b>\nUsername: <b><i>@$username</i></b>\nTime: <b><i>$date</i></b>\nMessage:\n\n<b><i>$message</i></b>",
@@ -467,14 +412,12 @@
 				die();
 			}
 			//////////////////////////////////////// EXCEPTION HANGLING ////////////////////////////////////////
-			typing($chat_id);
 			bot("sendMessage",	[
 				"chat_id"		=> $chat_id,
 				"text"			=> "<b>\"O'zbekiston Yoshlar Ittifoqi\"</b>, <b>\"Muhammad al-Xorazmiy nomidagi axborot texnologiyalariga ixtisoslashgan maktab\"</b> va <b>\"O'zbekiston Matematiklar va Informatika Assotsiatsiyasi\"</b> tashabbusi bilan birga tashkil etilgan onlayn matematika olimpiadasi qabuliga xush kelibsiz!",
 				"parse_mode"	=> "html",
 				"reply_markup"	=> $default
 			]);
-			typing($chat_id);
 			bot("sendDocument",	[
 				"chat_id"		=> $chat_id,
 				"document"		=> "BQACAgIAAxkBAAIByl6bTm4tlKO7gDBktdPhdBL2Jbl3AAJIBwACIA3ZSMSPIy4qnYo3GAQ",
@@ -505,7 +448,6 @@
 
 		// => RULES
 		else if($message == "📜Olimpiada shartlari") {
-			typing($chat_id);
 			bot("sendDocument",	[
 				"chat_id"		=> $chat_id,
 				"document"		=> "BQACAgIAAxkBAAIByl6bTm4tlKO7gDBktdPhdBL2Jbl3AAJIBwACIA3ZSMSPIy4qnYo3GAQ",
@@ -517,17 +459,15 @@
 
 		// => CONTACT
 		else if($message == "📲Biz bilan bog'lanish") {
-			typing($chat_id);
 			bot("sendPhoto",	[
 				"chat_id"		=> $chat_id,
-				"photo"			=> UZMIA,
+				"photo"			=> "AgACAgIAAxkBAAEMxzFex8i_9Whks_FMlawQjAgBoEuYiAAC3K0xG0xhOUq1YNZXpUCnZHBCfZEuAAMBAAMCAAN5AAPkjwMAARkE",
 				"caption"		=> "📥 <b>Biz bilan bog'lanish:</b>\n\n📞 Tel.: +998 97-776-97-22\n🌐 Telegram: <a href=\"https://t.me/uzmia31\">UZMIA</a>",
 				"parse_mode"	=> "html",
 				"reply_markup"	=> $default
 			]);
 		}
 		else {
-			typing($chat_id);
 			bot("sendMessage",	[
 				"chat_id"		=> $chat_id,
 				"text"			=> "Iltimos, quyidagi tugmalardan birini bosing!",
@@ -536,4 +476,5 @@
 			]);
 		}
 	}
+	mysqli_close($con);
 ?>
