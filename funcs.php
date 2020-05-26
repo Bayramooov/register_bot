@@ -1,5 +1,5 @@
 <?php
-	require_once("settings.php");
+	require_once("config.php");
 	function add_user($con, $update) {
 		$chat_id	= $update -> message -> chat -> id;
 		$first_name	= $update -> message -> from -> first_name;

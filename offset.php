@@ -1,5 +1,5 @@
 <?php
-	require_once("settings.php");
+	require_once("config.php");
 	require_once("funcs.php");
 
 	file_get_contents(DELETE_WEBHOOK);

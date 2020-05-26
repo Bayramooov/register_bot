@@ -1,5 +1,5 @@
 <?php
-	require_once("settings.php");
+	require_once("config.php");
 	require_once("funcs.php");
 	set_time_limit(0);
 	$default = json_encode([
