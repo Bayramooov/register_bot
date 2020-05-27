@@ -1,15 +1,8 @@
 <?php
 	require_once("config.php");
 	require_once("funcs.php");
-	/***********************************************
-		#PREDEFINED CONSTANTS FROM PRIVATE.PHP
-			DB_HOST
-			DB_USERNAME
-			DB_PASSWORD
-			DB_NAME
-			API_KEY
-	***********************************************/
-	//	WEBHOOK
+
+	// WEBHOOK
 	$update = json_decode(file_get_contents("php://input"));
 	$chat_id		= $update -> message -> chat -> id;
 	$first_name		= $update -> message -> from -> first_name;
@@ -25,17 +18,16 @@
 		DB_PASSWORD,
 		DB_NAME
 	);
-	//////////////////////////////////////// EXCEPTION HANGLING ////////////////////////////////////////
+
+	//////////////////////////////////////// DATABASE CONNECTION EXCEPTION ////////////////////////////////////////
 	if(!$con) {
-		typing($chat_id);
-		bot("sendMessage",	[
+		bot("sendMessage", [
 			"chat_id"		=> $chat_id,
 			"text"			=> "Kechirasiz texnik nosozlik sodir bo'ldi. Bu haqda texnik hodimlarga habar jo'natildi. Iltimos birozdan keyin habar oling.",
 			"parse_mode"	=> "markdown",
 			"reply_markup"	=> $default
 		]);
-		typing("373537481");
-		bot("sendMessage",	[
+		bot("sendMessage", [
 			"chat_id"		=> "373537481",	//ADMIN
 			"text"			=> "<b>DATABASE CONNECTION FAILED!</b>\n\nCHAT_ID: <b><i>$chat_id</i></b>\nName: <b><i>$first_name</i></b>\nUsername: <b><i>@$username</i></b>\nTime: <b><i>$date</i></b>\nMessage:\n\n<b><i>$message</i></b>",
 			"parse_mode"	=> "html",
@@ -43,7 +35,7 @@
 		]);
 		die();
 	}
-	//////////////////////////////////////// EXCEPTION HANGLING ////////////////////////////////////////
+	//////////////////////////////////////// DATABASE CONNECTION EXCEPTION ////////////////////////////////////////
 	// VALIDATION
 	$age_pattern = "/^\d\d$/";
 	$is_region =
@@ -66,7 +58,6 @@
 		||($message == "10 - sinf")
 		||($message == "11 - sinf")
 		||($message == "Talaba");
-	$phone_pattern = "/.*/";
 
 	// TELEGRAM BUTTONS
 	$default = json_encode([
@@ -450,7 +441,7 @@
 		else if($message == "📜Olimpiada shartlari") {
 			bot("sendDocument",	[
 				"chat_id"		=> $chat_id,
-				"document"		=> "BQACAgIAAxkBAAIByl6bTm4tlKO7gDBktdPhdBL2Jbl3AAJIBwACIA3ZSMSPIy4qnYo3GAQ",
+				"document"		=> "",
 				"caption"		=> "<b>📜 Iltimos ushbu ma'lumotlar bilan yaqindan tanishib chiqing!</b>",
 				"parse_mode"	=> "html",
 				"reply_markup"	=> $default
@@ -461,7 +452,7 @@
 		else if($message == "📲Biz bilan bog'lanish") {
 			bot("sendPhoto",	[
 				"chat_id"		=> $chat_id,
-				"photo"			=> "AgACAgIAAxkBAAEMxzFex8i_9Whks_FMlawQjAgBoEuYiAAC3K0xG0xhOUq1YNZXpUCnZHBCfZEuAAMBAAMCAAN5AAPkjwMAARkE",
+				"photo"			=> "",
 				"caption"		=> "📥 <b>Biz bilan bog'lanish:</b>\n\n📞 Tel.: +998 97-776-97-22\n🌐 Telegram: <a href=\"https://t.me/uzmia31\">UZMIA</a>",
 				"parse_mode"	=> "html",
 				"reply_markup"	=> $default
